@@ -28,7 +28,7 @@ func init(){
 func main(){
 	ctx := context.Background()
 
-	fmt.Println("Starting Chat Service...", modelName, location, projectID)
+	fmt.Println("Welcome to GoChat! (Type 'exit' to quit)")
 
 	geminiAiClient,err := geminai.NewGeminiAiClient(ctx, modelName, projectID, location)
 	if err != nil {
@@ -44,7 +44,6 @@ func main(){
 func terminal(chat *chat_service.ChatService) {
 	chat.Start(context.Background())
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter text: ")
 	for {
 		fmt.Print("> ")
 		input, err := reader.ReadString('\n')
