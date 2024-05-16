@@ -28,8 +28,6 @@ func init(){
 func main(){
 	ctx := context.Background()
 
-	
-
 	geminiAiClient,err := geminiai.NewGeminiAiClient(ctx, modelName, projectID, location)
 	if err != nil {
 		log.Fatalf("Failed to create GeminiAiClient: %v", err)
