@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/claudineijrdev/gochat/internal/geminai"
+	geminiai "github.com/claudineijrdev/gochat/internal/geminiai"
 	chat_service "github.com/claudineijrdev/gochat/internal/service"
 	"github.com/joho/godotenv"
 )
@@ -28,9 +28,9 @@ func init(){
 func main(){
 	ctx := context.Background()
 
-	fmt.Println("Welcome to GoChat! (Type 'exit' to quit)")
+	
 
-	geminiAiClient,err := geminai.NewGeminiAiClient(ctx, modelName, projectID, location)
+	geminiAiClient,err := geminiai.NewGeminiAiClient(ctx, modelName, projectID, location)
 	if err != nil {
 		log.Fatalf("Failed to create GeminiAiClient: %v", err)
 	}
@@ -38,17 +38,22 @@ func main(){
 
 	service := chat_service.NewChatService(geminiAiClient)
 
-	terminal(service)
+	err = terminal(service)
+
+	if err != nil {
+		log.Fatalf("Failed to run terminal: %v", err)
+	}
 }
 
-func terminal(chat *chat_service.ChatService) {
+func terminal(chat *chat_service.ChatService) error {
 	chat.Start(context.Background())
 	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Welcome to GoChat! (Type 'exit' to quit)")
 	for {
 		fmt.Print("> ")
 		input, err := reader.ReadString('\n')
 		if err != nil {
-			log.Fatalf("Failed to read input: %v", err)
+			return fmt.Errorf("failed to read input: %v", err)
 		}
 		filteredInput := strings.TrimSpace(input)
 		if filteredInput == "exit" {
@@ -57,8 +62,9 @@ func terminal(chat *chat_service.ChatService) {
 		}
 		err = chat.ChatClient.SendMessageStream(context.Background(), filteredInput)
 		if err != nil {
-			log.Fatalf("Failed to send message: %v", err)
+			return fmt.Errorf("failed to send message: %v", err)
 		}
 
 	}
+	return nil
 }

@@ -21,12 +21,5 @@ func NewChatService(chatClient interfaces.IChatClient) *ChatService {
 
 func (cs *ChatService) Start(ctx context.Context) error {
 	cs.ChatClient.StartChat()
-
-	// response, err  := cs.ChatClient.SendMessage(ctx, "Can you name some brands of cars?")
-	// if err != nil {
-	// 	return  err
-	// }
-
-	// cs.ChatClient.PrintResponse(response)
 	return nil
 }

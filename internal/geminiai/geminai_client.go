@@ -1,4 +1,4 @@
-package geminai
+package geminiai
 
 import (
 	"context"
