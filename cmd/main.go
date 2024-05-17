@@ -8,33 +8,25 @@ import (
 	"os"
 	"strings"
 
-	geminiai "github.com/claudineijrdev/gochat/internal/geminiai"
+	"github.com/claudineijrdev/gochat/infra/config"
+	"github.com/claudineijrdev/gochat/internal/factories"
 	chat_service "github.com/claudineijrdev/gochat/internal/service"
-	"github.com/joho/godotenv"
 )
 
-var (
-	modelName string
-	location string
-	projectID string
-)
+
 func init(){
-	godotenv.Load()
-	modelName = os.Getenv("MODEL_NAME")
-	location = os.Getenv("GCP_LOCATION")
-	projectID = os.Getenv("GCP_PROJECT_ID")
+	config.LoadConfig()
 }
 
 func main(){
 	ctx := context.Background()
 
-	geminiAiClient,err := geminiai.NewGeminiAiClient(ctx, modelName, projectID, location)
+	chatClient,err := factories.NewClientFactory().Create("openai", ctx)
 	if err != nil {
-		log.Fatalf("Failed to create GeminiAiClient: %v", err)
+		log.Fatalf("Failed to create ChatClient: %v", err)
 	}
-	defer geminiAiClient.Close()
-
-	service := chat_service.NewChatService(geminiAiClient)
+		
+	service := chat_service.NewChatService(chatClient)
 
 	err = terminal(service)
 
@@ -58,10 +50,12 @@ func terminal(chat *chat_service.ChatService) error {
 			fmt.Println("Exiting...")
 			break
 		}
-		err = chat.ChatClient.SendMessageStream(context.Background(), filteredInput)
+		//err = chat.ChatClient.SendMessageStream(context.Background(), filteredInput)
+		resp, err := chat.ChatClient.SendMessage(context.Background(), filteredInput)
 		if err != nil {
 			return fmt.Errorf("failed to send message: %v", err)
 		}
+		chat.ChatClient.PrintResponse(resp)
 
 	}
 	return nil

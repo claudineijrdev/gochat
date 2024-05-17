@@ -1,4 +1,4 @@
-package geminiai
+package geminiai_client
 
 import (
 	"context"
